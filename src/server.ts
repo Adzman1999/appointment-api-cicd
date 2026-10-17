@@ -1,12 +1,8 @@
-
 import app from "./app.js";
+import { env } from "./config/env.js";
 
-const port = Number(process.env.PORT ?? 3000);
-
-if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  throw new Error("PORT must be a valid TCP port number");
-}
-
-app.listen(port, () => {
-  console.log(`Appointment API listening on port ${port}`);
+app.listen(env.port, () => {
+  console.log(
+    `Appointment API listening on port ${env.port} (${env.nodeEnv})`,
+  );
 });
