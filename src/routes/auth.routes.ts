@@ -3,10 +3,15 @@ import {
   login,
   register,
 } from "../controllers/auth.controller.js";
+import {
+  loginSchema,
+  registerSchema,
+} from "../validation/auth.schemas.js";
+import { validateBody } from "../validation/validate.js";
 
 const router = Router();
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", validateBody(registerSchema), register);
+router.post("/login", validateBody(loginSchema), login);
 
 export default router;
