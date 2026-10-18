@@ -10,13 +10,14 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --exclude \"**/*.integration.test.ts\"",
     "test:watch": "vitest",
     "migrate:up": "dotenv run -- node-pg-migrate up -m migrations",
     "migrate:test": "dotenv run -f .env.test -- node-pg-migrate up -m migrations",
     "db:check": "tsx src/db/check.ts",
     "test:coverage": "vitest run --coverage",
-    "check": "npm run typecheck && npm run build && npm test"
+    "check": "npm run typecheck && npm run build && npm test",
+    "test:integration": "dotenv run -f .env.test -- vitest run src/db/postgres.integration.test.ts"
   },
   "keywords": [],
   "author": "",
