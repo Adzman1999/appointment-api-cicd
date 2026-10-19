@@ -178,10 +178,10 @@ export function App() {
         </div>
       )}
 
-      {/* Top Bar Banner: Philippines Healthcare Focus */}
+      {/* Top Region & Timezone Bar: Default Philippines with Global Multi-Region Support */}
       <div className="bg-slate-900 text-slate-300 text-[11px] font-medium py-1.5 px-4 text-center flex items-center justify-center gap-2 border-b border-slate-800">
         <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-        <span>🇵🇭 Accredited Doctor Appointments across Metro Manila, BGC, Makati, and Cebu</span>
+        <span>🌐 Global Healthcare Scheduling &bull; Default Region: Philippines (PHT / UTC+8) &bull; International Telehealth Ready</span>
       </div>
 
       {/* Modern Floating Header */}
@@ -195,11 +195,11 @@ export function App() {
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-xl tracking-tight text-slate-900">CareSync</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60">
-                  Enterprise
+                  Global
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Philippines Clinical Scheduling & Smart Hold Network
+                Universal Clinical Scheduling & Real-Time Smart Hold Platform
               </p>
             </div>
           </div>
@@ -212,7 +212,7 @@ export function App() {
                   healthStatus === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
                 }`}
               />
-              <span>API: {healthStatus === "healthy" ? "Online (PHT)" : "Connecting..."}</span>
+              <span>API: {healthStatus === "healthy" ? "Online (Global / PHT)" : "Connecting..."}</span>
             </div>
 
             <button
@@ -259,26 +259,30 @@ export function App() {
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-semibold backdrop-blur-md border border-white/10">
                 <Award className="w-3.5 h-3.5 text-amber-400" />
-                <span>Zero Double-Booking Guarantee &bull; PHT Timezone</span>
+                <span>Zero Double-Booking Guarantee &bull; Global Multi-Timezone</span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-                Healthcare Scheduling with <span className="text-indigo-400">3-Minute Smart Hold</span>
+                Universal Healthcare Scheduling with <span className="text-indigo-400">3-Minute Smart Hold</span>
               </h1>
               <p className="text-slate-300 text-sm leading-relaxed max-w-xl">
-                Select your specialist from premier hospitals across the Philippines. When you reserve a slot, our PostgreSQL database locks it for 3 minutes so nobody else can take it while you confirm.
+                Book consultations with board-certified medical specialists worldwide, with default hub in the Philippines. When you reserve a slot, our database locks it for 3 minutes so no other patient globally can double-book it while you confirm.
               </p>
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>St. Luke&apos;s BGC</span>
+                  <span>St. Luke&apos;s BGC (PH)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Makati Medical</span>
+                  <span>Makati Medical Center (PH)</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>The Medical City</span>
+                  <span>Singapore General (SG)</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Mayo Clinic Network (US)</span>
                 </div>
               </div>
             </div>
@@ -536,19 +540,19 @@ export function App() {
       <footer className="mt-auto bg-white border-t border-slate-200 px-4 sm:px-8 py-8 text-xs text-slate-500">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900 text-sm">CareSync Health</span>
+            <span className="font-extrabold text-slate-900 text-sm">CareSync Global Health</span>
             <span>&bull;</span>
-            <span>Philippines Clinical Network</span>
+            <span>Worldwide Clinical Network (Primary Hub: Philippines)</span>
           </div>
 
           <p className="text-slate-400">
-            &copy; {currentYear} CareSync Health Enterprise. All rights reserved.
+            &copy; {currentYear} CareSync Health Inc. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-xs font-medium">
             <span className="text-emerald-600 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Operational 99.99%
+              Global Cloud Status: 99.99% Uptime
             </span>
           </div>
         </div>
