@@ -13,6 +13,7 @@ import {
 } from "./api";
 import { CountdownTimer } from "./components/CountdownTimer";
 import { AuthModal } from "./components/AuthModal";
+import { MedicalHeroIllustration } from "./components/MedicalHeroIllustration";
 import {
   Activity,
   Calendar,
@@ -23,9 +24,12 @@ import {
   Stethoscope,
   Trash2,
   User as UserIcon,
-  Sparkles,
   ShieldCheck,
   RefreshCw,
+  MapPin,
+  HeartPulse,
+  Award,
+  Filter,
 } from "lucide-react";
 
 export function App() {
@@ -38,6 +42,8 @@ export function App() {
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("All");
+
+  const currentYear = new Date().getFullYear();
 
   const showFeedback = (type: "success" | "error", message: string) => {
     setFeedback({ type, message });
@@ -62,7 +68,6 @@ export function App() {
   };
 
   useEffect(() => {
-    // Check local storage for user token
     const savedUser = localStorage.getItem("clinix_user");
     if (savedUser) {
       try {
@@ -72,15 +77,14 @@ export function App() {
       }
     }
 
-    // Health check
     fetchHealth()
       .then(() => setHealthStatus("healthy"))
       .catch(() => setHealthStatus("error"));
 
     loadData();
 
-    // Auto-refresh slots every 15 seconds to sync hold releases
-    const interval = setInterval(loadData, 15000);
+    // Auto-refresh every 12 seconds to sync hold releases
+    const interval = setInterval(loadData, 12000);
     return () => clearInterval(interval);
   }, [user?.id]);
 
@@ -88,7 +92,7 @@ export function App() {
     localStorage.setItem("clinix_token", token);
     localStorage.setItem("clinix_user", JSON.stringify(authenticatedUser));
     setUser(authenticatedUser);
-    showFeedback("success", `Welcome back, ${authenticatedUser.email}`);
+    showFeedback("success", `Mabuhay, ${authenticatedUser.email}! You are now signed in.`);
     loadData();
   };
 
@@ -97,7 +101,7 @@ export function App() {
     localStorage.removeItem("clinix_user");
     setUser(null);
     setAppointments([]);
-    showFeedback("success", "Logged out successfully");
+    showFeedback("success", "Signed out successfully");
     loadData();
   };
 
@@ -155,120 +159,149 @@ export function App() {
   const filteredSlots = selectedSpecialty === "All" ? slots : slots.filter((s) => s.specialty === selectedSpecialty);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800">
-      {/* Top Notification Toast */}
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-800 antialiased selection:bg-indigo-600 selection:text-white">
+      {/* Toast Alert */}
       {feedback && (
         <div
-          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg border text-sm font-medium flex items-center gap-2 transition-all duration-300 ${
+          className={`fixed top-5 right-5 z-50 px-4 py-3 rounded-2xl shadow-2xl border text-sm font-semibold flex items-center gap-2.5 transition-all duration-300 animate-slide-in ${
             feedback.type === "success"
               ? "bg-emerald-50 border-emerald-200 text-emerald-800"
               : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           {feedback.type === "success" ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           ) : (
-            <Activity className="w-4 h-4 text-rose-600" />
+            <Activity className="w-5 h-5 text-rose-600" />
           )}
           <span>{feedback.message}</span>
         </div>
       )}
 
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-4 lg:px-8 py-3.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md shadow-indigo-600/20">
-            <Stethoscope className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">CareSync</span>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/50">
-                Enterprise
-              </span>
+      {/* Top Bar Banner: Philippines Healthcare Focus */}
+      <div className="bg-slate-900 text-slate-300 text-[11px] font-medium py-1.5 px-4 text-center flex items-center justify-center gap-2 border-b border-slate-800">
+        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+        <span>🇵🇭 Accredited Doctor Appointments across Metro Manila, BGC, Makati, and Cebu</span>
+      </div>
+
+      {/* Modern Floating Header */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 transition-all">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/25 transition-transform hover:scale-105">
+              <HeartPulse className="w-5 h-5" />
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Healthcare Scheduling & Smart Hold Platform</p>
-          </div>
-        </div>
-
-        {/* Right Nav */}
-        <div className="flex items-center gap-3">
-          {/* Health indicator */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-medium text-slate-600">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                healthStatus === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
-              }`}
-            />
-            <span>API: {healthStatus === "healthy" ? "Online" : "Connecting..."}</span>
-          </div>
-
-          <button
-            onClick={loadData}
-            disabled={loading}
-            className="p-2 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-            title="Refresh Slots"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-          </button>
-
-          {user ? (
-            <div className="flex items-center gap-2">
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 text-xs font-semibold text-slate-700 border border-slate-200/60">
-                <UserIcon className="w-3.5 h-3.5 text-indigo-600" />
-                <span>{user.email}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-xl tracking-tight text-slate-900">CareSync</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60">
+                  Enterprise
+                </span>
               </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+              <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
+                Philippines Clinical Scheduling & Smart Hold Network
+              </p>
             </div>
-          ) : (
+          </div>
+
+          {/* Right Header Navigation */}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-600 border border-slate-200/60">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  healthStatus === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
+                }`}
+              />
+              <span>API: {healthStatus === "healthy" ? "Online (PHT)" : "Connecting..."}</span>
+            </div>
+
             <button
-              onClick={() => setAuthModalOpen(true)}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all flex items-center gap-1.5"
+              onClick={loadData}
+              disabled={loading}
+              className="p-2.5 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+              title="Refresh schedule"
             >
-              <UserIcon className="w-3.5 h-3.5" />
-              <span>Sign In</span>
+              <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             </button>
-          )}
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
+                  <UserIcon className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="max-w-[140px] truncate">{user.email}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthModalOpen(true)}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all hover:shadow-indigo-600/35 hover:-translate-y-0.5 flex items-center gap-1.5"
+              >
+                <UserIcon className="w-3.5 h-3.5" />
+                <span>Patient Sign In</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 lg:px-8 py-6">
-        {/* Hero Concept Card */}
-        <div className="mb-8 p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl relative overflow-hidden">
-          <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-medium backdrop-blur-sm mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Ticketmaster-Style Concurrency Protection</span>
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
+        {/* Modern Vector Hero Section (No AI Images) */}
+        <section className="mb-10 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-2xl p-6 sm:p-10 relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            <div className="lg:col-span-7 space-y-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-semibold backdrop-blur-md border border-white/10">
+                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <span>Zero Double-Booking Guarantee &bull; PHT Timezone</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                Healthcare Scheduling with <span className="text-indigo-400">3-Minute Smart Hold</span>
+              </h1>
+              <p className="text-slate-300 text-sm leading-relaxed max-w-xl">
+                Select your specialist from premier hospitals across the Philippines. When you reserve a slot, our PostgreSQL database locks it for 3 minutes so nobody else can take it while you confirm.
+              </p>
+              <div className="flex flex-wrap items-center gap-4 pt-2">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>St. Luke&apos;s BGC</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Makati Medical</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>The Medical City</span>
+                </div>
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">
-              3-Minute Smart Hold Slot Reservation
-            </h1>
-            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-              When you reserve an appointment slot, our PostgreSQL database locks it with a temporary TTL hold. Complete your booking with zero double-booking risk.
-            </p>
-          </div>
-          <div className="absolute right-0 bottom-0 translate-x-12 translate-y-12 w-64 h-64 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
-        </div>
 
-        {/* Tab Controls */}
+            {/* Vector Graphic Centerpiece */}
+            <div className="lg:col-span-5 flex justify-center">
+              <MedicalHeroIllustration />
+            </div>
+          </div>
+        </section>
+
+        {/* Tab & Filter Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2 p-1 bg-slate-200/60 rounded-2xl w-fit">
+          <div className="flex items-center gap-2 p-1.5 bg-slate-200/60 rounded-2xl w-fit">
             <button
               onClick={() => setActiveTab("slots")}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                 activeTab === "slots"
-                  ? "bg-white text-slate-900 shadow-sm shadow-slate-900/5"
+                  ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <Calendar className="w-3.5 h-3.5" />
+              <Calendar className="w-3.5 h-3.5 text-indigo-600" />
               <span>Available Doctors ({slots.filter((s) => s.status !== "booked").length})</span>
             </button>
             <button
@@ -279,21 +312,21 @@ export function App() {
                   setActiveTab("appointments");
                 }
               }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                 activeTab === "appointments"
-                  ? "bg-white text-slate-900 shadow-sm shadow-slate-900/5"
+                  ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>My Bookings ({appointments.filter((a) => a.status === "booked").length})</span>
             </button>
           </div>
 
-          {/* Specialty Filter */}
+          {/* Specialty Filter Pills */}
           {activeTab === "slots" && specialties.length > 1 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-              <span className="text-xs font-semibold text-slate-400 mr-1">Filter:</span>
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              <Filter className="w-3.5 h-3.5 text-slate-400" />
               {specialties.map((spec) => (
                 <button
                   key={spec}
@@ -311,14 +344,14 @@ export function App() {
           )}
         </div>
 
-        {/* View 1: Available Slots */}
+        {/* View 1: Slots Grid */}
         {activeTab === "slots" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredSlots.length === 0 ? (
               <div className="col-span-full py-16 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
-                <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="font-semibold text-sm">No appointment slots found</p>
-                <p className="text-xs mt-1">Run the seeder or check back soon!</p>
+                <Stethoscope className="w-8 h-8 mx-auto mb-2 opacity-40 text-indigo-600" />
+                <p className="font-bold text-sm text-slate-700">No appointment slots available</p>
+                <p className="text-xs mt-1 text-slate-400">Run the seeder or check back shortly!</p>
               </div>
             ) : (
               filteredSlots.map((slot) => {
@@ -327,74 +360,78 @@ export function App() {
                 const isBooked = slot.status === "booked";
 
                 const startDate = new Date(slot.starts_at);
-                const timeString = `${startDate.toLocaleDateString(undefined, {
+                const timeString = `${startDate.toLocaleDateString("en-PH", {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
-                })} • ${startDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+                })} • ${startDate.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })}`;
 
                 return (
                   <div
                     key={slot.id}
-                    className={`p-5 rounded-2xl border transition-all duration-200 flex flex-col justify-between ${
+                    className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between ${
                       isHeldByMe
-                        ? "bg-amber-50/60 border-amber-300 ring-2 ring-amber-400 shadow-md"
+                        ? "bg-amber-50/70 border-amber-300 ring-2 ring-amber-400 shadow-xl scale-[1.01]"
                         : isBooked
-                        ? "bg-slate-50/60 border-slate-200 opacity-60"
+                        ? "bg-slate-50/80 border-slate-200 opacity-60"
                         : isHeldByOther
-                        ? "bg-slate-100/60 border-slate-200 text-slate-400"
-                        : "bg-white border-slate-200/80 hover:border-indigo-300 hover:shadow-lg shadow-sm"
+                        ? "bg-slate-100/70 border-slate-200 text-slate-400"
+                        : "bg-white border-slate-200/90 hover:border-indigo-300 hover:shadow-xl hover:-translate-y-1 shadow-sm"
                     }`}
                   >
                     <div>
-                      {/* Top Row: Specialty & Status */}
+                      {/* Top Badges */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                          {slot.specialty}
-                        </span>
+                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100">
+                          <MapPin className="w-3 h-3 text-indigo-500" />
+                          <span className="truncate max-w-[180px]">{slot.specialty}</span>
+                        </div>
 
                         {isHeldByMe && slot.held_until ? (
                           <CountdownTimer heldUntil={slot.held_until} onExpire={loadData} />
                         ) : isHeldByOther ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
                             <Lock className="w-3 h-3" />
                             <span>On Hold</span>
                           </span>
                         ) : isBooked ? (
-                          <span className="text-[11px] font-semibold text-slate-400">Booked</span>
+                          <span className="text-[11px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                            Booked
+                          </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/50">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Available
                           </span>
                         )}
                       </div>
 
-                      {/* Doctor Name & Time */}
-                      <h3 className="font-bold text-base text-slate-900 leading-snug">{slot.provider_name}</h3>
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-2 font-medium">
+                      {/* Doctor Profile */}
+                      <h3 className="font-extrabold text-base text-slate-900 leading-snug">
+                        {slot.provider_name}
+                      </h3>
+                      <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-2 font-semibold">
                         <Clock className="w-3.5 h-3.5 text-indigo-500" />
-                        <span>{timeString}</span>
+                        <span>{timeString} (PHT)</span>
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
+                    {/* Bottom Action */}
+                    <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center gap-2">
                       {isHeldByMe ? (
                         <>
                           <button
                             onClick={() => handleConfirm(slot.id)}
-                            className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5"
+                            className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-600/25 flex items-center justify-center gap-1.5"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <CheckCircle2 className="w-4 h-4" />
                             <span>Confirm Booking</span>
                           </button>
                           <button
                             onClick={() => handleRelease(slot.id)}
                             className="py-2 px-3 bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-xl text-xs font-semibold transition-colors"
-                            title="Release this hold"
                           >
-                            Cancel
+                            Release
                           </button>
                         </>
                       ) : isHeldByOther ? (
@@ -415,7 +452,7 @@ export function App() {
                       ) : (
                         <button
                           onClick={() => handleHold(slot.id)}
-                          className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/15 flex items-center justify-center gap-1.5"
+                          className="w-full py-2.5 px-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/35 flex items-center justify-center gap-1.5"
                         >
                           <Clock className="w-3.5 h-3.5" />
                           <span>Reserve (Hold 3m)</span>
@@ -429,14 +466,16 @@ export function App() {
           </div>
         )}
 
-        {/* View 2: My Appointments */}
+        {/* View 2: My Bookings */}
         {activeTab === "appointments" && (
           <div className="space-y-3 max-w-2xl mx-auto">
             {appointments.length === 0 ? (
               <div className="py-16 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
-                <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p className="font-semibold text-sm">No booked appointments yet</p>
-                <p className="text-xs mt-1">Switch to Available Doctors and hold a slot to get started!</p>
+                <Calendar className="w-8 h-8 mx-auto mb-2 opacity-50 text-indigo-500" />
+                <p className="font-bold text-sm text-slate-700">No confirmed appointments yet</p>
+                <p className="text-xs mt-1 text-slate-400">
+                  Switch to Available Doctors and hold a slot to secure your schedule.
+                </p>
               </div>
             ) : (
               appointments.map((appt) => {
@@ -447,7 +486,9 @@ export function App() {
                   <div
                     key={appt.id}
                     className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-4 ${
-                      isCancelled ? "bg-slate-50 border-slate-200 opacity-60" : "bg-white border-slate-200 shadow-sm"
+                      isCancelled
+                        ? "bg-slate-50 border-slate-200 opacity-60"
+                        : "bg-white border-slate-200 shadow-sm hover:shadow-md"
                     }`}
                   >
                     <div>
@@ -461,23 +502,23 @@ export function App() {
                         >
                           {appt.status}
                         </span>
-                        <span className="text-xs text-slate-400">{appt.specialty}</span>
+                        <span className="text-xs font-medium text-slate-400">{appt.specialty}</span>
                       </div>
-                      <h4 className="font-bold text-sm text-slate-900">{appt.provider_name}</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {startDate.toLocaleDateString(undefined, {
+                      <h4 className="font-extrabold text-sm text-slate-900">{appt.provider_name}</h4>
+                      <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                        {startDate.toLocaleDateString("en-PH", {
                           weekday: "short",
                           month: "short",
                           day: "numeric",
                         })}{" "}
-                        at {startDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        at {startDate.toLocaleTimeString("en-PH", { hour: "2-digit", minute: "2-digit" })} (PHT)
                       </p>
                     </div>
 
                     {!isCancelled && (
                       <button
                         onClick={() => handleCancelAppointment(appt.id)}
-                        className="py-1.5 px-3 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                        className="py-1.5 px-3 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors flex items-center gap-1.5"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Cancel</span>
@@ -490,6 +531,28 @@ export function App() {
           </div>
         )}
       </main>
+
+      {/* Dynamic Footer with current year */}
+      <footer className="mt-auto bg-white border-t border-slate-200 px-4 sm:px-8 py-8 text-xs text-slate-500">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-slate-900 text-sm">CareSync Health</span>
+            <span>&bull;</span>
+            <span>Philippines Clinical Network</span>
+          </div>
+
+          <p className="text-slate-400">
+            &copy; {currentYear} CareSync Health Enterprise. All rights reserved.
+          </p>
+
+          <div className="flex items-center gap-4 text-xs font-medium">
+            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Operational 99.99%
+            </span>
+          </div>
+        </div>
+      </footer>
 
       {/* Auth Modal */}
       <AuthModal

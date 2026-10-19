@@ -4,16 +4,17 @@ export async function seedDatabase() {
   const client = await pool.connect();
 
   try {
-    console.log("Seeding providers and future appointment slots...");
+    console.log("Seeding top Philippine medical specialists and future appointment slots...");
 
-    // Insert sample healthcare providers
+    // Insert sample reputable Philippine healthcare specialists (Manila, BGC, Makati, Cebu)
     const providersResult = await client.query(`
       INSERT INTO providers (name, specialty)
       VALUES 
-        ('Dr. Sarah Jenkins', 'Cardiology'),
-        ('Dr. Marcus Chen', 'Dermatology'),
-        ('Dr. Elena Rodriguez', 'Pediatrics'),
-        ('Dr. James Wilson', 'Orthopedics')
+        ('Dr. Maria Santos, MD', 'Cardiology (St. Luke''s BGC)'),
+        ('Dr. Juan Carlos Reyes, MD', 'Dermatology & Skin Center (Makati Med)'),
+        ('Dr. Kristine Joy Alcantara, MD', 'Pediatrics & Child Care (The Medical City)'),
+        ('Dr. Gabriel Mendoza, MD', 'Orthopedics & Sports Rehab (Asian Hospital)'),
+        ('Dr. Beatrice Lim, MD', 'Internal Medicine & Executive Checkup (Manila Doctors)')
       ON CONFLICT DO NOTHING
       RETURNING id, name;
     `);
@@ -21,7 +22,7 @@ export async function seedDatabase() {
     let providers = providersResult.rows;
 
     if (providers.length === 0) {
-      const existing = await client.query(`SELECT id, name FROM providers LIMIT 4`);
+      const existing = await client.query(`SELECT id, name FROM providers LIMIT 5`);
       providers = existing.rows;
     }
 
@@ -30,17 +31,18 @@ export async function seedDatabase() {
       return;
     }
 
-    // Generate slots for tomorrow and day after
+    // Generate slots for tomorrow and day after in Philippine Time (PHT - UTC+8)
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(9, 0, 0, 0);
 
     const slotTimes = [
-      { startHour: 9, startMin: 0, endHour: 9, endMin: 30 },
-      { startHour: 10, startMin: 0, endHour: 10, endMin: 30 },
-      { startHour: 11, startMin: 0, endHour: 11, endMin: 30 },
-      { startHour: 14, startMin: 0, endHour: 14, endMin: 30 },
-      { startHour: 15, startMin: 0, endHour: 15, endMin: 30 },
+      { startHour: 9, startMin: 0, endHour: 9, endMin: 45 },
+      { startHour: 10, startMin: 0, endHour: 10, endMin: 45 },
+      { startHour: 11, startMin: 0, endHour: 11, endMin: 45 },
+      { startHour: 13, startMin: 30, endHour: 14, endMin: 15 },
+      { startHour: 15, startMin: 0, endHour: 15, endMin: 45 },
+      { startHour: 16, startMin: 0, endHour: 16, endMin: 45 },
     ];
 
     for (const provider of providers) {
@@ -59,7 +61,7 @@ export async function seedDatabase() {
       }
     }
 
-    console.log("Database seeded successfully with doctors and future slots!");
+    console.log("Philippine healthcare doctors and appointment schedule seeded successfully!");
   } catch (error) {
     console.error("Error seeding database:", error);
     throw error;
