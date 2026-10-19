@@ -182,12 +182,12 @@ export function App() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">Clinix</span>
+              <span className="font-extrabold text-lg tracking-tight text-slate-900">CareSync</span>
               <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/50">
-                Smart Hold
+                Enterprise
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Healthcare Appointment Booking System</p>
+            <p className="text-[11px] text-slate-400 font-medium">Healthcare Scheduling & Smart Hold Platform</p>
           </div>
         </div>
 

@@ -45,10 +45,10 @@ export const AuthModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
         <div className="bg-slate-900 px-6 py-6 text-white flex justify-between items-center">
           <div>
             <h2 className="text-xl font-bold">
-              {isRegister ? "Create Clinix Account" : "Welcome Back to Clinix"}
+              {isRegister ? "Create CareSync Account" : "Welcome Back to CareSync"}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              {isRegister ? "Sign up to reserve and confirm doctor slots" : "Sign in to manage your appointments"}
+              {isRegister ? "Register for enterprise clinical scheduling" : "Sign in to manage your appointments and active holds"}
             </p>
           </div>
           <button
