@@ -1,8 +1,8 @@
 {
-  "name": "appointment-api-cicd",
+  "name": "caresync-health",
   "version": "1.0.0",
   "private": true,
-  "description": "Production-minded appointment booking API for CI/CD practice",
+  "description": "CareSync Health — Enterprise Patient Scheduling API & Real-Time Booking Platform",
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
