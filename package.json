@@ -18,7 +18,8 @@
     "test:coverage": "vitest run --coverage",
     "check": "npm run typecheck && npm run build && npm test",
     "test:integration": "dotenv run -f .env.test -- vitest run src/db/postgres.integration.test.ts",
-    "test:e2e": "dotenv run -f .env.test -- vitest run src/http.e2e.test.ts"
+    "test:e2e": "dotenv run -f .env.test -- vitest run src/http.e2e.test.ts",
+    "test:smoke": "bash scripts/smoke-test.sh"
   },
   "keywords": [],
   "author": "",
