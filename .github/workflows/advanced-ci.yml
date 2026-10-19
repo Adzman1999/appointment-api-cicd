@@ -1,0 +1,71 @@
+name: Advanced CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: advanced-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: appointment-api-build
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  package:
+    name: Verify Build Artifact
+    needs: quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: appointment-api-build
+          path: dist/
+
+      - name: Verify build output
+        run: |
+          test -f dist/server.js
+          echo "PASS: dist/server.js exists"
+
+      - name: Identify source revision
+        run: |
+          echo "Commit SHA: $GITHUB_SHA"
+          echo "Build artifact verified"
