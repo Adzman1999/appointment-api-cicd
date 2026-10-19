@@ -66,3 +66,21 @@ export async function deleteAppointment(
     next(error);
   }
 }
+
+export async function listMyAppointments(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    if (!req.user) {
+      throw new AppError(401, "Authentication required");
+    }
+
+    const { getMyAppointments } = await import("../services/appointment.service.js");
+    const appointments = await getMyAppointments(req.user.id);
+    res.status(200).json({ data: appointments });
+  } catch (error) {
+    next(error);
+  }
+}

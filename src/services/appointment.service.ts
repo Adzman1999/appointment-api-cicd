@@ -7,6 +7,8 @@ import {
   findBookingForUpdate,
   findSlotForUpdate,
   insertBooking,
+  listUserAppointments,
+  updateSlotStatus,
   userExists,
 } from "../repositories/appointment.repository.js";
 
@@ -38,6 +40,7 @@ export async function bookAppointment(
     }
 
     const appointment = await insertBooking(client, userId, slotId);
+    await updateSlotStatus(client, slotId, "booked");
 
     await client.query("COMMIT");
 
@@ -77,6 +80,7 @@ export async function cancelAppointment(
     }
 
     const cancelled = await cancelBooking(client, appointmentId);
+    await updateSlotStatus(client, appointment.slot_id, "available");
 
     await client.query("COMMIT");
 
@@ -87,4 +91,8 @@ export async function cancelAppointment(
   } finally {
     client.release();
   }
+}
+
+export async function getMyAppointments(userId: number) {
+  return await listUserAppointments(userId);
 }

@@ -91,3 +91,40 @@ export async function cancelBooking(
 
   return result.rows[0];
 }
+
+export async function updateSlotStatus(
+  client: PoolClient,
+  slotId: number,
+  status: "available" | "held" | "booked",
+) {
+  await client.query(
+    `UPDATE appointment_slots
+     SET status = $1, held_by_user_id = NULL, held_until = NULL
+     WHERE id = $2`,
+    [status, slotId],
+  );
+}
+
+export async function listUserAppointments(userId: number) {
+  const query = `
+    SELECT 
+      a.id,
+      a.user_id,
+      a.slot_id,
+      a.status,
+      a.created_at,
+      p.name AS provider_name,
+      p.specialty,
+      s.starts_at,
+      s.ends_at
+    FROM appointments a
+    JOIN appointment_slots s ON a.slot_id = s.id
+    JOIN providers p ON s.provider_id = p.id
+    WHERE a.user_id = $1
+    ORDER BY a.created_at DESC
+  `;
+
+  const { pool } = await import("../db/pool.js");
+  const result = await pool.query(query, [userId]);
+  return result.rows;
+}

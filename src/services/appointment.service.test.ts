@@ -15,6 +15,7 @@ const { mockPool, mockClient, repo } = vi.hoisted(() => {
             findSlotForUpdate: vi.fn(),
             activeBookingExists: vi.fn(),
             insertBooking: vi.fn(),
+            updateSlotStatus: vi.fn(),
             findBookingForUpdate: vi.fn(),
             cancelBooking: vi.fn(),
         },
