@@ -1,0 +1,39 @@
+{
+  "family": "appointment-api-cicd",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::000000000000:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "appointment-api",
+      "image": "000000000000.dkr.ecr.us-east-1.localhost:4566/appointment-api-cicd:phase13",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "PORT",
+          "value": "8000"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "postgres://appointment:local_docker_password@host.docker.internal:5433/appointment_docker"
+        },
+        {
+          "name": "JWT_SECRET",
+          "value": "local-docker-secret-change-this-to-at-least-32-characters"
+        }
+      ]
+    }
+  ]
+}
