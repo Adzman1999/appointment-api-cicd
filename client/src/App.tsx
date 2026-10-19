@@ -6,7 +6,6 @@ import {
   releaseSlot,
   bookSlot,
   cancelAppointment,
-  fetchHealth,
   Slot,
   Appointment,
   User,
@@ -38,7 +37,6 @@ export function App() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [activeTab, setActiveTab] = useState<"slots" | "appointments">("slots");
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [healthStatus, setHealthStatus] = useState<"healthy" | "error" | "loading">("loading");
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("All");
@@ -76,10 +74,6 @@ export function App() {
         localStorage.removeItem("clinix_user");
       }
     }
-
-    fetchHealth()
-      .then(() => setHealthStatus("healthy"))
-      .catch(() => setHealthStatus("error"));
 
     loadData();
 
@@ -178,13 +172,7 @@ export function App() {
         </div>
       )}
 
-      {/* Top Region & Timezone Bar: Default Philippines with Global Multi-Region Support */}
-      <div className="bg-slate-900 text-slate-300 text-[11px] font-medium py-1.5 px-4 text-center flex items-center justify-center gap-2 border-b border-slate-800">
-        <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-        <span>🌐 Global Healthcare Scheduling &bull; Default Region: Philippines (PHT / UTC+8) &bull; International Telehealth Ready</span>
-      </div>
-
-      {/* Modern Floating Header */}
+      {/* Clean Modern Floating Header */}
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-3.5 transition-all">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -195,26 +183,17 @@ export function App() {
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-xl tracking-tight text-slate-900">CareSync</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/60">
-                  Global
+                  Health
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-                Universal Clinical Scheduling & Real-Time Smart Hold Platform
+                Patient Appointment Scheduling & Smart Hold System
               </p>
             </div>
           </div>
 
           {/* Right Header Navigation */}
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-xs font-semibold text-slate-600 border border-slate-200/60">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  healthStatus === "healthy" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
-                }`}
-              />
-              <span>API: {healthStatus === "healthy" ? "Online (Global / PHT)" : "Connecting..."}</span>
-            </div>
-
             <button
               onClick={loadData}
               disabled={loading}
@@ -229,6 +208,11 @@ export function App() {
                 <div className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-700 border border-slate-200">
                   <UserIcon className="w-3.5 h-3.5 text-indigo-600" />
                   <span className="max-w-[140px] truncate">{user.email}</span>
+                  {user.role === "admin" && (
+                    <span className="px-1.5 py-0.2 rounded-md bg-purple-100 text-purple-700 text-[10px] uppercase font-bold">
+                      Admin
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -239,13 +223,26 @@ export function App() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setAuthModalOpen(true)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all hover:shadow-indigo-600/35 hover:-translate-y-0.5 flex items-center gap-1.5"
-              >
-                <UserIcon className="w-3.5 h-3.5" />
-                <span>Patient Sign In</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const guestPatient: User = { id: 101, email: "patient.guest@caresync.com", role: "patient" };
+                    handleAuthSuccess(guestPatient, "guest-patient-token");
+                  }}
+                  className="hidden sm:inline-flex px-3 py-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all items-center gap-1.5"
+                  title="Demo Patient Login"
+                >
+                  <span>👤 Guest Demo</span>
+                </button>
+
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition-all hover:shadow-indigo-600/35 hover:-translate-y-0.5 flex items-center gap-1.5"
+                >
+                  <UserIcon className="w-3.5 h-3.5" />
+                  <span>Sign In</span>
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -253,36 +250,36 @@ export function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
-        {/* Modern Vector Hero Section (No AI Images) */}
+        {/* Modern Vector Hero Section */}
         <section className="mb-10 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-2xl p-6 sm:p-10 relative overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             <div className="lg:col-span-7 space-y-4">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 text-indigo-300 text-xs font-semibold backdrop-blur-md border border-white/10">
                 <Award className="w-3.5 h-3.5 text-amber-400" />
-                <span>Zero Double-Booking Guarantee &bull; Global Multi-Timezone</span>
+                <span>Zero Double-Booking Guarantee</span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-                Universal Healthcare Scheduling with <span className="text-indigo-400">3-Minute Smart Hold</span>
+                Modern Healthcare Scheduling with <span className="text-indigo-400">3-Minute Smart Hold</span>
               </h1>
               <p className="text-slate-300 text-sm leading-relaxed max-w-xl">
-                Book consultations with board-certified medical specialists worldwide, with default hub in the Philippines. When you reserve a slot, our database locks it for 3 minutes so no other patient globally can double-book it while you confirm.
+                Select your medical specialist and appointment time. When you reserve a slot, our database locks it for 3 minutes so no one else can take it while you confirm your booking.
               </p>
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>St. Luke&apos;s BGC (PH)</span>
+                  <span>Cardiology</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Makati Medical Center (PH)</span>
+                  <span>Dermatology</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Singapore General (SG)</span>
+                  <span>Pediatrics</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Mayo Clinic Network (US)</span>
+                  <span>Orthopedics</span>
                 </div>
               </div>
             </div>
@@ -540,19 +537,19 @@ export function App() {
       <footer className="mt-auto bg-white border-t border-slate-200 px-4 sm:px-8 py-8 text-xs text-slate-500">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-slate-900 text-sm">CareSync Global Health</span>
+            <span className="font-extrabold text-slate-900 text-sm">CareSync Health</span>
             <span>&bull;</span>
-            <span>Worldwide Clinical Network (Primary Hub: Philippines)</span>
+            <span>Smart Patient Scheduling Platform</span>
           </div>
 
           <p className="text-slate-400">
-            &copy; {currentYear} CareSync Health Inc. All rights reserved.
+            &copy; {currentYear} CareSync Health. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-xs font-medium">
             <span className="text-emerald-600 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Global Cloud Status: 99.99% Uptime
+              High Availability 99.99%
             </span>
           </div>
         </div>

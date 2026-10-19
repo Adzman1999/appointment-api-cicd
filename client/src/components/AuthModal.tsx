@@ -123,6 +123,45 @@ export const AuthModal: React.FC<Props> = ({ isOpen, onClose, onSuccess }) => {
             )}
           </button>
 
+          {/* Quick 1-Click Demo Guest Logins */}
+          <div className="pt-2">
+            <div className="relative flex py-1 items-center">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink mx-3 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                Demo Guest Access
+              </span>
+              <div className="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const demoPatient: User = { id: 101, email: "patient.guest@caresync.com", role: "patient" };
+                  onSuccess(demoPatient, "demo-guest-token");
+                  onClose();
+                }}
+                className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 border border-slate-200 text-slate-700 text-xs font-bold transition-all text-center flex flex-col items-center justify-center"
+              >
+                <span>👤 Guest Patient</span>
+                <span className="text-[10px] font-normal text-slate-400">1-Click Test</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const demoAdmin: User = { id: 1, email: "admin.director@caresync.com", role: "admin" };
+                  onSuccess(demoAdmin, "demo-admin-token");
+                  onClose();
+                }}
+                className="py-2 px-3 rounded-xl bg-slate-100 hover:bg-purple-50 hover:text-purple-700 border border-slate-200 text-slate-700 text-xs font-bold transition-all text-center flex flex-col items-center justify-center"
+              >
+                <span>⚡ Guest Admin</span>
+                <span className="text-[10px] font-normal text-slate-400">1-Click Test</span>
+              </button>
+            </div>
+          </div>
+
           <div className="pt-2 text-center text-xs text-slate-500">
             {isRegister ? "Already have an account?" : "Need an account?"}{" "}
             <button
