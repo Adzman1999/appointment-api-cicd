@@ -7,6 +7,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "client:dev": "npm --prefix client run dev",
+    "client:build": "npm --prefix client run build",
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
@@ -15,6 +17,7 @@
     "migrate:up": "dotenv run -- node-pg-migrate up -m migrations",
     "migrate:test": "dotenv run -f .env.test -- node-pg-migrate up -m migrations",
     "db:check": "tsx src/db/check.ts",
+    "db:seed": "tsx src/db/seed.ts",
     "test:coverage": "vitest run --coverage",
     "check": "npm run typecheck && npm run build && npm test",
     "test:integration": "dotenv run -f .env.test -- vitest run src/db/postgres.integration.test.ts",
